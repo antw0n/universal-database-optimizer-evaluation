@@ -1,0 +1,26 @@
+{% if index -%}
+db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_C'] }}").createIndex({c_acctbal:1}, {name: "idx_c_acctbal_mc"});
+{% endif %}
+{% if explain -%} 
+printjson(db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_C'] }}").explain("allPlansExecution").aggregate([
+{% else %}
+cursor = db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_C'] }}").aggregate([
+{% endif %}
+   { $match: { c_acctbal: { $lt: {{ variables['point']['q4']['lt_balance'] }} }}}
+{% if explain %}
+], {
+	allowDiskUse: true,
+	maxTimeMS: {{ variables['max_time_ms'] }}
+}));
+{% else %}
+], {
+	allowDiskUse: true,
+	maxTimeMS: {{ variables['max_time_ms'] }}
+});
+while ( cursor.hasNext() ) {
+      printjson( cursor.next() );
+}
+{% endif %}
+{% if index -%}
+db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_C'] }}").dropIndex("idx_c_acctbal_mc");
+{% endif %}

@@ -1,0 +1,28 @@
+: '
+MongoDB Configuration
+
+- database connection string
+'
+connection_string=mongodb://<host_name>:<port>,<host_name>:<port>,<host_name>:<port>/?replicaSet=<replica_set_name>
+
+: '
+PostgreSQL Configuration
+
+Database password will be asked when initiated.
+
+- database host
+- database port
+- database username
+- database password
+- database bin
+- database data
+- database service
+'
+host=<host_name>
+port=<port>
+user=<user>
+password=<password>
+
+bin='/usr/pgsql-<version>/bin'
+data='/var/lib/pgsql/<version>/data'
+service='postgresql-<version>'

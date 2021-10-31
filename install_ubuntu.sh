@@ -1,0 +1,1 @@
+sudo apt install -y mongodb-org-tools mongodb-mongosh

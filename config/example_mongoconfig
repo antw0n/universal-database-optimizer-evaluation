@@ -1,0 +1,27 @@
+: '
+Schema configuration
+
+Schema to produce. mode can be:"
+    psql: PostgreSQL's relational schema"
+    psql_json: PostgreSQL's json S1 schema"
+    mongo_1c: MongoDB's S1 schema"
+    mongo_2c: MongoDB's S3 schema"
+    mongo_3c: MongoDB's S2 schema"
+'
+mode=mongo_1c
+
+: '
+MongoDB Configuration
+
+- database connection string
+- database name
+'
+connection_string=<replica_set_name>/<host_name>:<port>,<host_name>:<port>,<host_name>:<port>
+database=tpch_mongo_1c
+
+: '
+TPC Configuration
+
+- dbgen scale factor
+'
+scale=1

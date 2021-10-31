@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="load all" type="CompoundRunConfigurationType">
+    <toRun name="load dataset (mongo_3c)" type="ShConfigurationType" />
+    <toRun name="load dataset (mongo_1c)" type="ShConfigurationType" />
+    <toRun name="load dataset (mongo_2c)" type="ShConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

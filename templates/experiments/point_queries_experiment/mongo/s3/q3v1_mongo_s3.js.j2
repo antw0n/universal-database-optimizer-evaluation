@@ -1,0 +1,33 @@
+{% if index -%}
+db.getSiblingDB("{{ variables['mongo_db_name_s3'] }}").getCollection("{{ variables['mongo_OjL'] }}").createIndex({o_custkey:1}, {name:"idx_o_custkey_mol"});
+{% endif %}
+{% if explain -%} 
+printjson(db.getSiblingDB("{{ variables['mongo_db_name_s3'] }}").getCollection("{{ variables['mongo_OjL'] }}").explain("allPlansExecution").aggregate([
+{% else %}
+cursor = db.getSiblingDB("{{ variables['mongo_db_name_s3'] }}").getCollection("{{ variables['mongo_OjL'] }}").aggregate([
+{% endif %}
+   {$lookup:{
+	from:"{{ variables['mongo_C'] }}",
+	localField:"o_custkey",
+	foreignField:"_id",
+	as:"customer"
+   }},
+   {$unwind:"$customer"},
+   {$project:{c_name:"$customer.c_name", o_orderdate:1}}
+{% if explain %}
+], {
+	allowDiskUse: true,
+	maxTimeMS: {{ variables['max_time_ms'] }}
+}));
+{% else %}
+], {
+	allowDiskUse: true,
+	maxTimeMS: {{ variables['max_time_ms'] }}
+});
+while ( cursor.hasNext() ) {
+      printjson( cursor.next() );
+}
+{% endif %}
+{% if index -%}
+db.getSiblingDB("{{ variables['mongo_db_name_s3'] }}").getCollection("{{ variables['mongo_OjL'] }}").dropIndex("idx_o_custkey_mol");
+{% endif %}

@@ -1,0 +1,34 @@
+{% if explain -%}
+printjson(db.getSiblingDB("{{ variables['mongo_db_name_s1'] }}").getCollection("{{ variables['mongo_CjOjL'] }}").explain("allPlansExecution").aggregate([
+{% else %}
+cursor = db.getSiblingDB("{{ variables['mongo_db_name_s1'] }}").getCollection("{{ variables['mongo_CjOjL'] }}").aggregate([
+{% endif %}
+   {$project: {
+      c_orders:{
+         $filter:{
+            input: "$c_orders",
+            as: "o",
+            cond: {$eq:["$$o.o_orderkey", {{ variables['point']['q1']['orderkey'] }}]}
+          }
+      }
+   }},
+   {$unwind:"$c_orders"},
+   {$project:{_id:0, orders:"$c_orders"}},
+   {$unwind:"$orders.o_lineitems"},
+   {$project:{lineitems:"$orders.o_lineitems"}},
+   {$unwind:"$lineitems"},
+   {$replaceRoot:{newRoot:"$lineitems"}}
+{% if explain %}
+], {
+	allowDiskUse: true,
+	maxTimeMS: {{ variables['max_time_ms'] }}
+}));
+{% else %}
+], {
+	allowDiskUse: true,
+	maxTimeMS: {{ variables['max_time_ms'] }}
+});
+while ( cursor.hasNext() ) {
+      printjson( cursor.next() );
+}
+{% endif %}

@@ -1,0 +1,33 @@
+{% if index -%}
+db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_L'] }}").createIndex({"_id.l_orderkey":1}, {name:"idx_l_orderkey_ml"});
+{% endif %}
+{% if explain -%}
+printjson(db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_O'] }}").explain("allPlansExecution").aggregate([
+{% else %}
+cursor = db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_O'] }}").aggregate([
+{% endif %}
+   {$lookup:{
+	from:"{{ variables['mongo_L'] }}",
+	localField:"_id",
+	foreignField:"_id.l_orderkey",
+	as:"lineitems"
+   }},
+   {$unwind:"$lineitems"},
+   {$project:{_id:1, l_shipdate:"$lineitems.l_shipdate"}}
+{% if explain %}
+], {
+	allowDiskUse: true,
+	maxTimeMS: {{ variables['max_time_ms'] }}
+}));
+{% else %}
+], {
+	allowDiskUse: true,
+	maxTimeMS: {{ variables['max_time_ms'] }}
+})maxTimeMS;
+while ( cursor.hasNext() ) {
+      printjson( cursor.next() );
+}
+{% endif %}
+{% if index -%}
+db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_L'] }}").dropIndex("idx_l_orderkey_ml");
+{% endif %}

@@ -1,0 +1,20 @@
+{% if explain -%}
+printjson(db.getSiblingDB("{{ variables['mongo_db_name_s1'] }}").getCollection("{{ variables['mongo_CjOjL'] }}").explain("allPlansExecution").aggregate([
+{% else %}
+cursor = db.getSiblingDB("{{ variables['mongo_db_name_s1'] }}").getCollection("{{ variables['mongo_CjOjL'] }}").aggregate([
+{% endif %}
+   { $match: { c_acctbal: { $lt: {{ variables['point']['q4']['lt_balance'] }} }}}
+{% if explain %}
+], {
+	allowDiskUse: true,
+	maxTimeMS: {{ variables['max_time_ms'] }}
+}));
+{% else %}
+], {
+	allowDiskUse: true,
+	maxTimeMS: {{ variables['max_time_ms'] }}
+});
+while ( cursor.hasNext() ) {
+      printjson( cursor.next() );
+}
+{% endif %}

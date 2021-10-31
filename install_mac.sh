@@ -1,0 +1,1 @@
+sudo port selfupdate && sudo port install mongo-tools
