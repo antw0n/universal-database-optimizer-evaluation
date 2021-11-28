@@ -23,7 +23,7 @@ cursor = db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{
 ], {
 	allowDiskUse: true,
 	maxTimeMS: {{ variables['max_time_ms'] }}
-})maxTimeMS;
+});
 while ( cursor.hasNext() ) {
       printjson( cursor.next() );
 }

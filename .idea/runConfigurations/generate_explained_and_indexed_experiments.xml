@@ -13,7 +13,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="create_queries.py" />
-    <option name="PARAMETERS" value="-i -e -f ../templates/vars.yml -t ../templates/experiments -o ../output/experiments" />
+    <option name="PARAMETERS" value="-i -e -f ../templates/vars.yml -t ../templates/experiments -o ../output/queries" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />

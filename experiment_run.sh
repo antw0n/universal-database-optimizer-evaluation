@@ -4,7 +4,8 @@ source lib/config.sh
 
 root_dir="$(dirname "$0")"
 output_dir="$root_dir/output"
-query_dir="$output_dir/experiments"
+input_dir="$root_dir/input"
+query_dir="$output_dir/queries"
 runs=5
 force_timeout=false
 
@@ -78,10 +79,10 @@ function verify() {
 
 function drop_mongo_cache() {
   echo "Dropping Mongo system caches"
-  mongo_control "shutdown" ${1}
+  mongo_control "shutdown"
   # Drop system caches
   multipass exec mt-mongo-1 -- sudo bash -c 'sync && echo 3 > /proc/sys/vm/drop_caches' >>"$file_out"
-  mongo_control "startup" ${1}
+  mongo_control "startup"
 }
 
 function mongo_control() {
@@ -146,26 +147,49 @@ function experiment_with_mongo() {
 
 function run_mongo() {
     for ((i = 0; i < runs; i++)); do
-      drop_mongo_cache ${2}
+      drop_mongo_cache
+      add_ext_config ${3}
       echo "mongo --host \"$(config_get connection_string)\" \"${1}\""
       mongo --host "$(config_get connection_string)" "${1}" >>"${2}" || true
       wait $!
       echo -e "\n" >>"${2}"
     done
-  }
+}
 
 function run_mongo_force_timeout() {
     for ((i = 0; i < runs; i++)); do
-      drop_mongo_cache ${2}
+      drop_mongo_cache
+      add_ext_config ${3}
       echo "timeout \"$(config_get mongo_force_timeout_duration)\" mongo --host \"$(config_get connection_string)\" \"${1}\""
       timeout $(config_get mongo_force_timeout_duration) mongo --host "$(config_get connection_string)" "${1}" >>"${2}" || true
       if [[ $? -eq 124 ]]; then
-        echo "timeout" >>"${2}"
+        echo "forced timeout" >>"${2}"
       else
         wait $!
         echo -e "\n" >>"${2}"
       fi
     done
+}
+
+function create_ext_indexes() {
+  run_command_mongo "$input_dir/s1/add_ext_idx_config.js"
+  run_command_mongo "$input_dir/s2/add_ext_idx_config.js"
+  run_command_mongo "$input_dir/s3/add_ext_idx_config.js"
+}
+
+function add_ext_config() {
+  run_command_mongo "$input_dir/${1}/add_ext_db_config.js"
+}
+
+function drop_all_indexes() {
+  run_command_mongo "$input_dir/drop_all_idx.js"
+}
+
+function run_command_mongo() {
+  if [ -f "${1}" ]; then
+    echo "Found: ${1}"
+    mongo --host "$(config_get connection_string)" "${1}" || true
+  fi
 }
 
 q_selected=false
@@ -222,6 +246,8 @@ set -e
 set_config
 
 echo "Experimenting..."
+drop_all_indexes
+create_ext_indexes
 for q in "${selected_queries[@]}"; do
   for file in $(find "$query_dir" -type f -regextype awk -regex ".*q${q}(v[0-9]+)?_.*"); do
     echo "Running experiment q=${file}"
@@ -240,8 +266,10 @@ for q in "${selected_queries[@]}"; do
       wt=$(awk '/Execution Time/{sum += $3; n++} END {print sum/n}' "$file_out")
       ;;
     "js")
-      experiment_with_mongo $file $file_out
-      wt=$(awk -F'[:,]' '/executionTimeMillis/{sum += $2; n++} END {print sum/n}' "$file_out")
+      qset=$(echo "$fname" | awk 'BEGIN {FS="_|\."} {print $3}')
+      echo "file=$file, file_out=$file_out, qset=$qset"
+      experiment_with_mongo $file $file_out $qset
+      wt=$(awk -F'[:,]' '/"executionTimeMillis"/{sum += $2; n++} END {print sum/n}' "$file_out")
       if [ "$wt" = "-nan" ] && [ $(grep -c "MaxTimeMSExpired" "$file_out") -ne 0 ]; then
         wt="timeout"
       fi
@@ -252,3 +280,5 @@ for q in "${selected_queries[@]}"; do
     echo "Finished experiment q=${file}"
   done
 done
+drop_all_indexes
+echo "Done..."

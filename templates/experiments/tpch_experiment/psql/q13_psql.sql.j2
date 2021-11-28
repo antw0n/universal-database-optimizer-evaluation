@@ -12,7 +12,7 @@ from
 			c_custkey,
 			count(o_orderkey)
 		from
-			{{ variables['tpch']['psql_db_schema'] }}.customer left outer join {{ variables['psql_db_schema'] }}.orders on
+			{{ variables['psql_db_schema'] }}.customer left outer join {{ variables['psql_db_schema'] }}.orders on
 				c_custkey = o_custkey
 				and o_comment not like '%{{ variables['tpch']['q13']['comment_1'] }}%{{ variables['tpch']['q13']['comment_2'] }}%'
 		group by

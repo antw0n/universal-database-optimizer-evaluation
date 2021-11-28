@@ -22,5 +22,5 @@ while ( cursor.hasNext() ) {
 }
 {% endif %}
 {% if index -%}
-db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_CjOjL'] }}").dropIndex("idx_c_acctbal_mcol");
+db.getSiblingDB("{{ variables['mongo_db_name_s1'] }}").getCollection("{{ variables['mongo_CjOjL'] }}").dropIndex("idx_c_acctbal_mcol");
 {% endif %}
