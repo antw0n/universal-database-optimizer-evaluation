@@ -1,7 +1,6 @@
 # Description
 
-This repository contains amended version of the implementation used for the experiments described
-on the paper: "Experimental Comparison of Relational and NoSQL Systems: the Case of Decision Support"
+This repository contains an amended version of the implementation used for the experiments described in the paper: "Experimental Comparison of Relational and NoSQL Systems: the Case of Decision Support".
 
 The sole purpose of this amendment is to evaluate the [universal database optimizer (UDO)](https://github.com/antw0n/universal-database-optimizer).
 
@@ -9,10 +8,10 @@ The sole purpose of this amendment is to evaluate the [universal database optimi
 
 **Execution**  
 
-Per default the experiment executor will run all the experiments and forces the given timeout. 
+Per default, the experiment executor will run all the experiments and force the given timeout. 
 The `basic` experiments run once, whereas the experiments that produce explain statements (`explain`) will be executed five times.
-Average execution time of all the executions is added to `results.csv`.
-Optimization experiment (`optim`) is executed as well and therefore `_input` should be provided. 
+The average execution time of all the executions is added to `results.csv`.
+Optimization experiment (`optim`) is executed as well, and therefore `_input` should be provided. 
 
 **Steps**  
 
@@ -101,8 +100,8 @@ Storage for the optimized configuration suggested by UDO. Substructure according
 - `add_ext_idx_config.js` for index configuration
 - `add_ext_db_config.js` for database configuration
 
-`_input` is a configuration storage folder. The configuration can be placed here and it won't be considered during the experimentation.
-`input` is active configuration folder. A suggested configuration can be activated by moving it in this folder.
+`_input` is a configuration storage folder. The configuration can be placed here, and it won't be considered during the experimentation.
+`input` is a folder for an active configuration. A stored configuration can be activated by moving it in this folder.
 
 ## lib
 Contains all the utilities:
@@ -147,7 +146,7 @@ The scripts for MongoDB are not required.
 
 **Dataset**  
 
-Datasets according to the paper: "Experimental Comparison of Relational and NoSQL Systems: the Case of Decision Support"
+Datasets according to the paper: "Experimental Comparison of Relational and NoSQL Systems: the Case of Decision Support".
 
 **Experiments**  
 
@@ -164,24 +163,26 @@ The sub-directory `experiments` follows the form `<indexing mode>/<execution mod
 │   │   │       │   └── s3
 │   │   │       └── psql
 ```
----    
-*Indexing mode* 
+ 
+*Indexing mode*  
+
 - ```index```: contains experiments executed with indexing  
 - ```no-index```: contains experiments executed without indexing  
 - ```optim```:  contains experiments executed with indexing optimized by UDO  
 
 *Timeout*   
+
 - ```timeout```: interrupts operation executed in ```mongo shell```
 - ```forced timeout```: interrupts ```mongo shell```
 
 *Execution mode*   
-- ```explain```: The file `results.csv` in `<explain/results>` contains the average running time or timeout note for each query. The results of SQL ```expaline``` can be found in the `<query>.explain` files.   
+
+- ```explain```: The file `results.csv` in `<explain/results>` contains the average running time or timeout note for each query. The results of SQL ```explain``` can be found in the `<query>.explain` files.   
 - ```basic```: The file `results.csv` in `<basic/results>` contains the value `-nan` for successful execution or timeout note if execution takes too long. The query results are stored in the `<query>.out` files.   
 
 *Experiment*  
 
-Output of the experiments according to the paper: "Experimental Comparison of Relational and NoSQL Systems: the Case of Decision Support"
-Only two experiment types are considered:
+The output of the experiments according to the paper: "Experimental Comparison of Relational and NoSQL Systems: the Case of Decision Support". Only two experiment types are considered:
 - point_queries_experiment
 - tpch_experiment
 
@@ -199,7 +200,9 @@ The folder contains all the results of that specific experiment.
 
 Contains all TPC-H benchmark related tools and data.
 
-# NOTES
+---
+
+# Notes
 
 ## Query Generation
 
