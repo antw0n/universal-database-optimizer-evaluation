@@ -15,7 +15,7 @@ Original version of the [Universal Database Optimizer (UDO)](https://github.com/
 
 **Execution**  
 
-Per default, the experiment executor will run all the experiments and force the given timeout. 
+Per default, the experiment executor will run all the experiments. 
 The `basic` experiments run once, whereas the experiments that produce explain statements (`explain`) will be executed five times.
 The average execution time of all the executions is added to `results.csv`.
 Optimization experiment (`optim`) is executed as well, and therefore `_input` should be provided. 
