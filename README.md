@@ -1,5 +1,7 @@
-# Description
+# Evaluation
 
+
+## Description
 
 This repository contains an amended version of the implementation used for the experiments described in the paper:
 
@@ -11,7 +13,7 @@ The sole purpose of this amendment is to evaluate the [Universal Database Optimi
 
 Original version of the [Universal Database Optimizer (UDO)](https://github.com/OVSS/UDO)
 
-# Quick start
+## Quick start
 
 **Execution**  
 
@@ -27,7 +29,7 @@ Optimization experiment (`optim`) is executed as well, and therefore `_input` sh
 
 On failure: add missing configuration.
 
-# Run Configuration
+## Run Configuration
 
 The project supports `Intellij run configurations`:
 
@@ -61,7 +63,7 @@ The project supports `Intellij run configurations`:
 `run experiment (all)`: run all experiments  
 `run_experiment (all) (force_timeout)`: run all experiments with forced timeout  
 
-# Directory Structure
+## Directory Structure
 
 ```
 .
@@ -84,7 +86,7 @@ The project supports `Intellij run configurations`:
 └── tpch_tools
 ```
 
-## bin
+### bin
 Contains the scripts used to create and run the experiments. Queries are rendered using
 the `create_queries.py` script (use `-h` option for help) and then run using the
 `run_experiment.sh` script (use `-h` option for help). The `crjoin` sub-folder contains
@@ -96,13 +98,13 @@ was originally built using GCCv8.3.0 and can be compiled using `make`.
 The scripts only work (as they are) on a MongoDB deployment that does not enforce
 authentication.
 
-## config
+### config
 Contains the database and dataset configuration files. Sample configurations are provided for:
 - Experiment configuration: ```example_experiment_config```
 - MongoDB configuration:  ```example_mongoconfig```
 - PostgreSQL configuration: ```example_postgresconfig```
 
-## _input and input
+### _input and input
 Storage for the optimized configuration suggested by UDO. Substructure according to the query set (`s1`,`s2`,`s3`) and configuration files:
 - `add_ext_idx_config.js` for index configuration
 - `add_ext_db_config.js` for database configuration
@@ -110,14 +112,14 @@ Storage for the optimized configuration suggested by UDO. Substructure according
 `_input` is a configuration storage folder. The configuration can be placed here, and it won't be considered during the experimentation.
 `input` is a folder for an active configuration. A stored configuration can be activated by moving it in this folder.
 
-## lib
+### lib
 Contains all the utilities:
 - `config.sh`: configuration utilities
 - `generate_data.sh`: data generation utilities
 - `import_data.sh`: data import utilities
 - `utils.sh`: common utilities
 
-## templates
+### templates
 
 Contains the `jinja2` templates of all PSQL and MongoDB **queries** and scripts involved in the
 creation of the schemas used during experimentation. The `vars.yml` file
@@ -141,7 +143,7 @@ The sub-directory `templates` is divided in creation scripts (`creation`) and ex
 │           └── psql
 ```
 
-## output
+### output
 
 Contains the creation scripts, datasets, and results for each experiment on different scale factors. 
 
@@ -203,15 +205,15 @@ The folder contains all the queries for that specific experiment.
 Temporary folder created during the execution of a specific experiment according to the paper: "Experimental Comparison of Relational and NoSQL Systems: the Case of Decision Support".
 The folder contains all the results of that specific experiment.
 
-## tpch_tools
+### tpch_tools
 
 Contains all TPC-H benchmark related tools and data.
 
 ---
 
-# Notes
+## Notes
 
-## Query Generation
+### Query Generation
 
 Queries can be rendered using the `create_queries.py` script under `./bin`. For
 instance, to generate all queries from the `TPCH` experiment one could
@@ -219,7 +221,7 @@ execute::
 
   ./bin/create_queries.py -t ./templates/tpch_experiment -o /path/to/output/dir
 
-## TPC-H dataset generation
+### TPC-H dataset generation
 
 The first step is to render the scripts inside the `templates/creation` folder. To do
 so you can use the `create_queries.py` script. An example is shown below.::
@@ -228,7 +230,7 @@ so you can use the `create_queries.py` script. An example is shown below.::
 
 Then, follow the instructions for each database below.
 
-## PostgreSQL
+### PostgreSQL
 1. Execute `./dbgen -s <scale factor>` inside `/path/to/TPC\_H/dbgen/`.
 2. Remove the extra `|` at the end of each line from each `.tbl` file produced 
    in the previous step. For example, as shown below.::
@@ -238,7 +240,7 @@ Then, follow the instructions for each database below.
 3. Import the data into PostgreSQL using the rendered `create_rdb.sql` script
    from the `creation` templates.
 
-## MongoDB
+### MongoDB
 1. Sort order by `custkey`::
     ```
     # sort stores temporary files in /tmp by default. If the
