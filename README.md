@@ -4,7 +4,7 @@ This repository contains the components relevant to the installation, configurat
 
 ## Description
 
-This repository contains an amended version of the implementation used for the experiments described in the paper:
+This repository is based on the implementation used for the experiments in the following research work:
 
 T. F. Llano-Ríos, M. Khalefa and A. Badia, "Evaluating NoSQL Systems for Decision Support: An Experimental Approach," 2020 IEEE International Conference on Big Data (Big Data), 2020, pp. 2802-2811, doi: 10.1109/BigData50022.2020.9377881.
 
@@ -12,7 +12,7 @@ URL: https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9377881&isnumber=9
 
 The sole purpose of this amendment is to evaluate the [Universal Database Optimizer (UDO)](https://github.com/antw0n/universal-database-optimizer).
 
-Original version of the [Universal Database Optimizer (UDO)](https://github.com/OVSS/UDO)
+Original version of the [Universal Database Optimizer (UDO)](https://github.com/OVSS/UDO).
 
 ## Quick start
 
