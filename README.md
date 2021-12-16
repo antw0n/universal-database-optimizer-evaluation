@@ -12,7 +12,7 @@ DOI: [10.1109/BigData50022.2020.9377881](https://doi.org/10.1109/BigData50022.20
 
 The sole purpose of this amendment is to evaluate the [Universal Database Optimizer (UDO)](https://github.com/antw0n/universal-database-optimizer).
 
-Original version of the [Universal Database Optimizer (UDO)](https://github.com/OVSS/UDO).
+Original version of the Universal Database Optimizer (UDO) can be found [here](https://github.com/OVSS/UDO).
 
 ## Quick start
 
