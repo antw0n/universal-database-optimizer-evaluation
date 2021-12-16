@@ -253,7 +253,7 @@ Then, follow the instructions for each database below.
    from the `creation` templates.
 
 ### MongoDB
-1. Sort order by `custkey`::
+1. Sort order by `custkey`:
     ```
     # sort stores temporary files in /tmp by default. If the
     # data is considerably big, one may need to use the -T option.
