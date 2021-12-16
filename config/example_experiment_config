@@ -2,8 +2,10 @@
 MongoDB Configuration
 
 - database connection string
+- timeout in minutes
 '
 connection_string=mongodb://<host_name>:<port>,<host_name>:<port>,<host_name>:<port>/?replicaSet=<replica_set_name>
+mongo_force_timeout_duration=<minutes>
 
 : '
 PostgreSQL Configuration

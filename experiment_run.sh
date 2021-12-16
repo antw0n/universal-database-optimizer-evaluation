@@ -8,6 +8,7 @@ input_dir="$root_dir/input"
 query_dir="$output_dir/queries"
 runs=5
 force_timeout=false
+pre_configure=false
 
 function abort() {
   local lineno=$1
@@ -39,6 +40,7 @@ function usage() {
   echo "  -r runs        Runs per query. Used to compute average runtime"
   echo "                 (Default: $runs)"
   echo "  -c             Path to configuration file"
+  echo "  -p             Pre configure query execution (Default: $pre_configure)"
   echo "  -t             Force timeout (Default: $force_timeout)"
   echo "  -h             Print this message"
 }
@@ -86,7 +88,7 @@ function drop_mongo_cache() {
 }
 
 function mongo_control() {
-  mongocli ops-manager clusters ${1} mt-exp-replica-001 --force >/dev/null 2>&1
+  mongocli ops-manager clusters ${1} $(config_get replica_set) --force >/dev/null 2>&1
   case "${1}" in
   "shutdown")
     verify_shutdown
@@ -97,34 +99,43 @@ function mongo_control() {
   esac
 }
 
-function verify_shutdown() {
-  echo "Verifying shutdown"
-  while true; do
-    if multipass exec mt-mongo-1 -- sudo bash -c 'systemctl status mongodb-mms-automation-agent.service' | grep -E '27011|27012|27013'; then
-      sleep 5
-      echo "WAITING..."
-    else
-      echo "OK"
-      break
-    fi
+# TODO: Hardcoded, make dynamic
+verify_startup() {
+  echo "Verifying startup"
+  local i
+  for i in mt-mongo-1 mt-mongo-2 mt-mongo-3
+  do
+    while : ; do
+        if check_mongo_sevice "$i"; then break; fi
+        sleep 5
+        echo "WAITING..."
+    done
   done
   echo '... done.'
 }
 
-function verify_startup() {
-  echo "Verifying startup"
-  while true; do
-    local result=$(multipass exec mt-mongo-1 -- sudo bash -c 'systemctl status mongodb-mms-automation-agent.service')
-    echo "$(grep -E '27011|27012|27013' <<<$result)"
-    if grep -q "27011" <<<"$result" && grep -q "27012" <<<"$result" && grep -q "27013" <<<"$result"; then
-      echo "OK"
-      break
-    else
-      sleep 5
-      echo "WAITING..."
-    fi
+# TODO: Hardcoded, make dynamic
+verify_shutdown() {
+  echo "Verifying shutdown"
+  local i
+  for i in mt-mongo-1 mt-mongo-2 mt-mongo-3
+  do
+    while : ; do
+        if ! check_mongo_sevice "$i"; then break; fi
+        sleep 5
+        echo "WAITING..."
+    done
   done
   echo '... done.'
+}
+
+function check_mongo_sevice(){
+  if multipass exec ${1} -- sudo bash -c 'systemctl status mongodb-mms-automation-agent.service' | grep -q "mongod -f /mnt/${1}-strg/automation-mongod.conf"
+  then
+    true
+  else
+    false
+  fi
 }
 
 function experiment_with_postgres() {
@@ -138,47 +149,35 @@ function experiment_with_postgres() {
 }
 
 function experiment_with_mongo() {
-  if $force_timeout; then
-    run_mongo_force_timeout "$@"
-  else
-    run_mongo "$@"
-  fi
+  echo "pre_configure=$pre_configure"
+  echo "force_timeout=$force_timeout"
+  for ((i = 0; i < runs; i++)); do
+    drop_all_indexes
+    drop_mongo_cache
+    if $pre_configure; then prepare_experiment ${1}; fi
+    if $force_timeout; then run_mongo_force_timeout "$@"; else run_mongo "$@"; fi
+    wait $!
+    echo -e "\n" >>"${2}"
+  done
 }
 
 function run_mongo() {
-    for ((i = 0; i < runs; i++)); do
-      drop_mongo_cache
-      add_ext_config ${3}
-      echo "mongo --host \"$(config_get connection_string)\" \"${1}\""
-      mongo --host "$(config_get connection_string)" "${1}" >>"${2}" || true
-      wait $!
-      echo -e "\n" >>"${2}"
-    done
+  echo "mongo --host \"$(config_get connection_string)\" \"${1}\""
+  mongo --host "$(config_get connection_string)" "${1}" >>"${2}" || true
 }
 
 function run_mongo_force_timeout() {
-    for ((i = 0; i < runs; i++)); do
-      drop_mongo_cache
-      add_ext_config ${3}
-      echo "timeout \"$(config_get mongo_force_timeout_duration)\" mongo --host \"$(config_get connection_string)\" \"${1}\""
-      timeout $(config_get mongo_force_timeout_duration) mongo --host "$(config_get connection_string)" "${1}" >>"${2}" || true
-      if [[ $? -eq 124 ]]; then
-        echo "forced timeout" >>"${2}"
-      else
-        wait $!
-        echo -e "\n" >>"${2}"
-      fi
-    done
+  echo "timeout \"$(config_get mongo_force_timeout_duration)\" mongo --host \"$(config_get connection_string)\" \"${1}\""
+  timeout $(config_get mongo_force_timeout_duration) mongo --host "$(config_get connection_string)" "${1}" >>"${2}" || true
 }
 
-function create_ext_indexes() {
-  run_command_mongo "$input_dir/s1/add_ext_idx_config.js"
-  run_command_mongo "$input_dir/s2/add_ext_idx_config.js"
-  run_command_mongo "$input_dir/s3/add_ext_idx_config.js"
-}
-
-function add_ext_config() {
-  run_command_mongo "$input_dir/${1}/add_ext_db_config.js"
+function prepare_experiment() {
+  local file
+  for file in $(find $input_dir -type f -printf '%P\n'); do
+    if [[ ${1} == *"${file%/*}/"* ]]; then
+      run_command_mongo "$input_dir/$file"
+    fi
+  done
 }
 
 function drop_all_indexes() {
@@ -193,7 +192,7 @@ function run_command_mongo() {
 }
 
 q_selected=false
-while getopts ":o:s:q:r:tc:h" opt; do
+while getopts ":o:s:q:r:ptc:h" opt; do
   case $opt in
   o)
     output_dir="$OPTARG"
@@ -207,6 +206,9 @@ while getopts ":o:s:q:r:tc:h" opt; do
     ;;
   r)
     runs=$OPTARG
+    ;;
+  p)
+    pre_configure=true
     ;;
   t)
     force_timeout=true
@@ -246,8 +248,6 @@ set -e
 set_config
 
 echo "Experimenting..."
-drop_all_indexes
-create_ext_indexes
 for q in "${selected_queries[@]}"; do
   for file in $(find "$query_dir" -type f -regextype awk -regex ".*q${q}(v[0-9]+)?_.*"); do
     echo "Running experiment q=${file}"
@@ -266,19 +266,18 @@ for q in "${selected_queries[@]}"; do
       wt=$(awk '/Execution Time/{sum += $3; n++} END {print sum/n}' "$file_out")
       ;;
     "js")
-      qset=$(echo "$fname" | awk 'BEGIN {FS="_|\."} {print $3}')
-      echo "file=$file, file_out=$file_out, qset=$qset"
-      experiment_with_mongo $file $file_out $qset
+      echo "file=$file, file_out=$file_out"
+      experiment_with_mongo $file $file_out
       wt=$(awk -F'[:,]' '/"executionTimeMillis"/{sum += $2; n++} END {print sum/n}' "$file_out")
       if [ "$wt" = "-nan" ] && [ $(grep -c "MaxTimeMSExpired" "$file_out") -ne 0 ]; then
         wt="timeout"
       fi
       ;;
     esac
+    drop_all_indexes
     echo "Result=$fpath $wt"
     echo "$fpath $wt" >>"$output_dir/results/results.csv"
     echo "Finished experiment q=${file}"
   done
 done
-drop_all_indexes
 echo "Done..."

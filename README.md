@@ -1,7 +1,7 @@
 # Description
 
 This repository contains amended version of the implementation used for the experiments described
-on the paper: "Experimental Comparison of Relational and NoSQL Systems: the Case of Decision Support"
+on the paper: "Experimental Comparison of Relational and NoSQL Systems: the Case of Decision Support".
 
 The sole purpose of this amendment is to evaluate the [universal database optimizer (UDO)](https://github.com/antw0n/universal-database-optimizer).
 
@@ -60,20 +60,19 @@ The project supports `Intellij run configurations`:
 ```
 .
 ├── bin
-│   └── crjoin
+│    └── crjoin
 ├── config
 ├── _input
-│   ├── s1
-│   ├── s2
-│   └── s3
+│    ├── default
+│    └── optim
 ├── input
 ├── lib
 ├── output
-│   ├── creation
-│   ├── dataset
-│   ├── experiments
-│   ├── queries (temp)
-│   └── results (temp)
+│    ├── creation
+│    ├── dataset
+│    ├── experiments
+│    ├── queries (temp)
+│    └── results (temp)
 ├── templates
 └── tpch_tools
 ```
@@ -97,9 +96,21 @@ Contains the database and dataset configuration files. Sample configurations are
 - PostgreSQL configuration: ```example_postgresconfig```
 
 ## _input and input
+```
+.
+└── execution type [default | optim]
+          ├── drop_all_idx.js
+          └── experiment [point_queries_experiment | tpch_experiment]
+              └── database [mongo]
+                  └── query set[s1|s2|s3]
+                            ├── add_db_config.js
+                            └── add_idx_config.js
+```
+
+
 Storage for the optimized configuration suggested by UDO. Substructure according to the query set (`s1`,`s2`,`s3`) and configuration files:
-- `add_ext_idx_config.js` for index configuration
-- `add_ext_db_config.js` for database configuration
+- `add_idx_config.js` for index configuration
+- `add_db_config.js` for database configuration
 
 `_input` is a configuration storage folder. The configuration can be placed here and it won't be considered during the experimentation.
 `input` is active configuration folder. A suggested configuration can be activated by moving it in this folder.
@@ -123,16 +134,16 @@ The sub-directory `templates` is divided in creation scripts (`creation`) and ex
 - `experiments`: follows the form `<experiment>/<database>/<query set>/`
 ```
 ├── templates
-│   ├── creation
-│   │   ├── mongo
-│   │   └── psql
-│   └── experiments
-│       ├── [ tpch_experiment | point_queries_experiment ]
-│           ├── mongo
-│           │   ├── s1
-│           │   ├── s2
-│           │   └── s3
-│           └── psql
+          ├── creation
+          │      ├── mongo
+          │      └── psql
+          └── experiments
+              └── [ tpch_experiment | point_queries_experiment ]
+                  ├── mongo
+                  │     ├── s1
+                  │     ├── s2
+                  │     └── s3
+                  └── psql
 ```
 
 ## output
@@ -154,15 +165,15 @@ Datasets according to the paper: "Experimental Comparison of Relational and NoSQ
 The sub-directory `experiments` follows the form `<indexing mode>/<execution mode>/<input/output>/<experiment>/`:
 ```
 .
-├── indexing mode [ index | no-index | optim ]
-│   ├── execution mode [ basic | explain ]
-│   │   ├── input/output [ queries | results ]
-│   │   │   ├── experiment [ point_queries_experiment | tpch_experiment ]
-│   │   │       ├── mongo
-│   │   │       │   ├── s1
-│   │   │       │   ├── s2
-│   │   │       │   └── s3
-│   │   │       └── psql
+└── indexing mode [ index | no-index | optim ]
+          └── execution mode [ basic | explain ]
+                    └── input/output [ queries | results ]
+                              ├── experiment [ point_queries_experiment | tpch_experiment ]
+                              ├── mongo
+                              │     ├── s1
+                              │     ├── s2
+                              │     └── s3
+                              └── psql
 ```
 ---    
 *Indexing mode* 

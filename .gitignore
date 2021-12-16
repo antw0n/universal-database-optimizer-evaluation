@@ -254,8 +254,8 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
+/input
 /output
 /results
-/final
 /config/.*
 !/config/.default_config

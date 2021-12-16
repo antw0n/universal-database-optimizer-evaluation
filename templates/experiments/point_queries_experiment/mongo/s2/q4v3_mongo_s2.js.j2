@@ -1,5 +1,5 @@
 {% if index -%}
-db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_C'] }}").createIndex({c_acctbal:1}, {name: "idx_c_acctbal_mc"});
+db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_C'] }}").createIndex({c_acctbal:-1}, {name: "idx_c_acctbal_mc"});
 {% endif %}
 {% if explain -%} 
 printjson(db.getSiblingDB("{{ variables['mongo_db_name_s2'] }}").getCollection("{{ variables['mongo_C'] }}").explain("allPlansExecution").aggregate([
