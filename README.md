@@ -1,6 +1,6 @@
 # Evaluation
 
-This repository contains the components relevant to the installation, configuration, and execution of the Universal Database Optimizer (UDO) evaluation.
+This repository contains the components relevant to the installation, configuration, and execution of Universal Database Optimizer (UDO) evaluation.
 
 ## Description
 
