@@ -142,7 +142,7 @@ The sub-directory `templates` is divided in creation scripts (`creation`) and ex
 - `creation`: structured per database (`mongo`|`psql`)  
 - `experiments`: follows the form `<experiment>/<database>/<query set>/`
 ```
-├── templates
+└── templates
           ├── creation
           │      ├── mongo
           │      └── psql
